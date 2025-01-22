@@ -1,4 +1,4 @@
-package internal
+package main
 
 type Task struct {
 	ID     int
@@ -8,4 +8,7 @@ type Task struct {
 
 func (t *Task) done() {
 	t.IsDone = true
+}
+func (t *Task) newID(id int) {
+	t.ID = id
 }

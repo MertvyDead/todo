@@ -1,4 +1,4 @@
-package internal
+package main
 
 import (
 	"fmt"
@@ -57,7 +57,10 @@ func (s *Storage) DeleteTask(ID int) error {
 	if ID <= 0 || ID > len(s.tasks)+1 {
 		return fmt.Errorf("Неверный ID")
 	}
-
+	s.tasks = append(s.tasks[:ID-1], s.tasks[ID:]...)
+	for i, v := range s.tasks {
+		v.newID(i + 1)
+	}
 	return nil
 }
 func (s *Storage) Clear() {
