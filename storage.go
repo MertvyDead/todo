@@ -6,9 +6,9 @@ import (
 
 type TaskManager interface {
 	AddTask(title string)
-	MarkDone(ID int)
-	ListTasks()
-	DeleteTask(ID int)
+	MarkDone(ID int) error
+	ListTasks() error
+	DeleteTask(ID int) error
 	Clear()
 }
 
@@ -25,7 +25,7 @@ func (s *Storage) AddTask(title string) {
 func (s *Storage) ListTasks() error {
 	if len(s.tasks) == 0 {
 
-		return fmt.Errorf("Список задач пуст")
+		return fmt.Errorf("cписок задач пуст")
 	}
 	for _, task := range s.tasks {
 		switch {
