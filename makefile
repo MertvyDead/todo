@@ -1,5 +1,5 @@
 run:
-	go run main.go
+	go run main.go storage.go task.go
 
 build:
 	go build -o todo_app main.go

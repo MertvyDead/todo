@@ -12,57 +12,56 @@ type TaskManager interface {
 	Clear()
 }
 
-type Storage struct {
-	tasks []Task
+type TaskStorage struct {
+	tasks []*Task
 }
 
-func (s *Storage) AddTask(title string) {
-	task := Task{ID: len(s.tasks) + 1, Title: title, IsDone: false}
+func (s *TaskStorage) AddTask(title string) {
+	task := &Task{ID: len(s.tasks) + 1, Title: title, IsDone: false}
 	s.tasks = append(s.tasks, task)
 	fmt.Printf("Задача \"%s\" добавлена", title)
 }
 
-func (s *Storage) ListTasks() error {
+func (s *TaskStorage) ListTasks() error {
 	if len(s.tasks) == 0 {
-
 		return fmt.Errorf("cписок задач пуст")
 	}
 	for _, task := range s.tasks {
-		switch {
-		case task.IsDone == false:
-			fmt.Printf("%v. [ ] %s", task.ID, task.Title)
-		case task.IsDone == true:
-			fmt.Printf("%v. [X] %s", task.ID, task.Title)
+		status := ""
+		switch task.IsDone {
+		case false:
+			status = "[ ]"
+			fmt.Printf("%v. %s %s\n", task.ID, status, task.Title)
+		case true:
+			status = "[X]"
+			fmt.Printf("%v. %s %s\n", task.ID, status, task.Title)
 		}
 
 	}
 	return nil
 }
 
-func (s *Storage) MarkDone(ID int) error {
+func (s *TaskStorage) MarkDone(ID int) error {
 	if ID <= 0 || ID > len(s.tasks)+1 {
-		return fmt.Errorf("Неверный ID")
+		return fmt.Errorf("неверный ID")
 	}
-
 	task := s.tasks[ID-1]
-	if task.IsDone == true {
-		fmt.Printf("Задача \"%s\" уже выполнена", task.Title)
-	} else {
-		task.done()
-		fmt.Printf("Теперь задача \"%s\" выполнена", task.Title)
-	}
+	task.done()
+	fmt.Printf("Теперь задача \"%s\" выполнена", task.Title)
 	return nil
 }
-func (s *Storage) DeleteTask(ID int) error {
+
+func (s *TaskStorage) DeleteTask(ID int) error {
 	if ID <= 0 || ID > len(s.tasks)+1 {
-		return fmt.Errorf("Неверный ID")
+		return fmt.Errorf("неверный ID")
 	}
 	s.tasks = append(s.tasks[:ID-1], s.tasks[ID:]...)
 	for i, v := range s.tasks {
 		v.newID(i + 1)
+
 	}
 	return nil
 }
-func (s *Storage) Clear() {
-	s.tasks = []Task{}
+func (s *TaskStorage) Clear() {
+	s.tasks = []*Task{}
 }

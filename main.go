@@ -1,73 +1,94 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func help() {
-	fmt.Println("Команды:\nadd \"Текст задачи\" - Добавить задачу,\nlist - Список задач,\ndone <ID> - отметить выполненную задачу,\nremove <ID> - удалить задачу,\nclear - удалить все задачи\nhelp - вывести это сообщение")
+	fmt.Println("Команды:\nadd \"Текст задачи\" - Добавить задачу,\nlist - Список задач,\ndone <ID> - отметить выполненную задачу,\nremove <ID> - удалить задачу,\nclear - удалить все задачи\nhelp - вывести это сообщение\nexit - выход из программы")
 }
 
 func main() {
-	var storage TaskManager = &Storage{}
+	help()
+	var (
+		storage TaskManager = &TaskStorage{}
+		scanner             = bufio.NewScanner(os.Stdin)
+	)
+	for {
 
-	if len(os.Args) < 2 {
-		help()
-		return
-	}
-	command := os.Args[1]
-	switch command {
-	case "add":
-		if len(os.Args) < 3 {
-			fmt.Println("Требуется title")
-			return
-		}
-		title := os.Args[2]
-		storage.AddTask(title)
-	case "list":
-		storage.ListTasks()
-	case "done":
-		if len(os.Args) < 3 {
-			fmt.Println("Требуется ID")
-			return
-		}
-		ID, err := strconv.Atoi(os.Args[2])
-		if err != nil || ID < 1 {
+		fmt.Println("\n>>> ")
+		scanner.Scan()
+		input := scanner.Text()
 
-			fmt.Println("Неправильный ID")
-			return
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("Ошибка чтения: %v\n", err)
+			break
 		}
-		err = storage.MarkDone(ID)
-		if err != nil {
+		args := strings.Fields(input)
+		if len(args) == 0 {
+			continue
+		}
+		command := args[0]
 
-			fmt.Println(err)
-			return
-		}
-	case "remove":
-		if len(os.Args) < 3 {
-			fmt.Println("Требуется ID")
-			return
-		}
-		ID, err := strconv.Atoi(os.Args[2])
+		switch command {
+		case "add":
+			if len(args) < 2 {
+				fmt.Println("Требуется title")
+				continue
+			}
+			title := strings.Join(args[1:], " ")
+			storage.AddTask(title)
 
-		if err != nil || ID < 1 {
+		case "list":
+			storage.ListTasks()
 
-			fmt.Println("Неправильный ID")
+		case "done":
+			if len(args) < 2 {
+				fmt.Println("Требуется ID")
+				continue
+			}
+			ID, err := strconv.Atoi(args[1])
+			if err != nil || ID < 1 {
+
+				fmt.Println("Неправильный ID")
+				continue
+			}
+			err = storage.MarkDone(ID)
+			if err != nil {
+
+				fmt.Println(err)
+				continue
+			}
+		case "remove":
+			if len(args) < 2 {
+				fmt.Println("Требуется ID")
+				continue
+			}
+			ID, err := strconv.Atoi(args[1])
+
+			if err != nil || ID < 1 {
+
+				fmt.Println("Неправильный ID")
+				continue
+			}
+			err = storage.DeleteTask(ID)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		case "clear":
+			storage.Clear()
+		case "help":
+			help()
+		case "exit":
 			return
+		default:
+			fmt.Println("Неизвестная команда")
+			help()
 		}
-		err = storage.DeleteTask(ID)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	case "clear":
-		storage.Clear()
-	case "help":
-		help()
-	default:
-		fmt.Println("Неизвестная команда")
-		help()
 	}
 }
