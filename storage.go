@@ -17,7 +17,7 @@ type TaskStorage struct {
 }
 
 func (s *TaskStorage) AddTask(title string) {
-	task := &Task{ID: len(s.tasks) + 1, Title: title, IsDone: false}
+	task := &Task{Title: title, IsDone: false}
 	s.tasks = append(s.tasks, task)
 	fmt.Printf("Задача \"%s\" добавлена", title)
 }
@@ -26,15 +26,15 @@ func (s *TaskStorage) ListTasks() error {
 	if len(s.tasks) == 0 {
 		return fmt.Errorf("cписок задач пуст")
 	}
-	for _, task := range s.tasks {
+	for i, task := range s.tasks {
 		status := ""
 		switch task.IsDone {
 		case false:
 			status = "[ ]"
-			fmt.Printf("%v. %s %s\n", task.ID, status, task.Title)
+			fmt.Printf("%v. %s %s\n", i+1, status, task.Title)
 		case true:
 			status = "[X]"
-			fmt.Printf("%v. %s %s\n", task.ID, status, task.Title)
+			fmt.Printf("%v. %s %s\n", i+1, status, task.Title)
 		}
 
 	}
@@ -56,10 +56,6 @@ func (s *TaskStorage) DeleteTask(ID int) error {
 		return fmt.Errorf("неверный ID")
 	}
 	s.tasks = append(s.tasks[:ID-1], s.tasks[ID:]...)
-	for i, v := range s.tasks {
-		v.newID(i + 1)
-
-	}
 	return nil
 }
 func (s *TaskStorage) Clear() {
